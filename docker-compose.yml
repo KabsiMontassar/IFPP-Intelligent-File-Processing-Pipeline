@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: fileflow
+      POSTGRES_PASSWORD: fileflow_password
+      POSTGRES_DB: fileflow_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fileflow -d fileflow_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching and queue management
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass redis_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: fileflow_admin
+      MINIO_ROOT_PASSWORD: fileflow_admin_password
+      MINIO_DOMAIN: localhost
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO Client for bucket initialization
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc alias set minio http://minio:9000 fileflow_admin fileflow_admin_password;
+      /usr/bin/mc mb minio/fileflow-uploads --ignore-existing;
+      /usr/bin/mc mb minio/fileflow-processed --ignore-existing;
+      /usr/bin/mc mb minio/fileflow-thumbnails --ignore-existing;
+      /usr/bin/mc policy set public minio/fileflow-uploads;
+      /usr/bin/mc policy set public minio/fileflow-processed;
+      /usr/bin/mc policy set public minio/fileflow-thumbnails;
+      echo 'MinIO buckets initialized successfully';
+      "
+
+  # FileFlow API Server
+  fileflow-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: fileflow
+      DB_PASSWORD: fileflow_password
+      DB_NAME: fileflow_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis_password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: fileflow_admin
+      MINIO_SECRET_KEY: fileflow_admin_password
+      MINIO_USE_SSL: false
+      UPLOAD_BUCKET: fileflow-uploads
+      PROCESSED_BUCKET: fileflow-processed
+      THUMBNAIL_BUCKET: fileflow-thumbnails
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+    ports:
+      - "3000:3000"
+    command: npm run dev
+
+  # FileFlow Worker Process
+  fileflow-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: fileflow
+      DB_PASSWORD: fileflow_password
+      DB_NAME: fileflow_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis_password
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: fileflow_admin
+      MINIO_SECRET_KEY: fileflow_admin_password
+      MINIO_USE_SSL: false
+      UPLOAD_BUCKET: fileflow-uploads
+      PROCESSED_BUCKET: fileflow-processed
+      THUMBNAIL_BUCKET: fileflow-thumbnails
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+    command: npm run worker
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  default:
+    name: fileflow-network
