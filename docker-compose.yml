@@ -133,7 +133,7 @@ services:
       UPLOAD_BUCKET: fileflow-uploads
       PROCESSED_BUCKET: fileflow-processed
       THUMBNAIL_BUCKET: fileflow-thumbnails
-    command: npm run start:worker
+    command: node dist/workers/index.js
 
 volumes:
   postgres_data:
