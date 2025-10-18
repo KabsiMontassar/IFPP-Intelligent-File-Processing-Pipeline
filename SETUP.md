@@ -22,6 +22,9 @@ cp .env.example .env
 
 # Install dependencies
 npm install
+
+# If you encounter package-lock.json conflicts, regenerate it:
+# rm package-lock.json && npm install
 ```
 
 ### 2. Start Services with Docker

@@ -14,7 +14,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies for building)
-RUN npm ci
+# Using npm install since package-lock.json is excluded in .dockerignore
+RUN npm install
 
 # Copy source code
 COPY . .
