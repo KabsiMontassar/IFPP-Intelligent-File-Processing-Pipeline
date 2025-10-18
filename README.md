@@ -396,6 +396,19 @@ export LOG_LEVEL=debug
 docker-compose up
 ```
 
+## 🔒 Security & Known Issues
+
+### Security Considerations
+
+- **Multer**: Updated to v2.x to address security vulnerabilities found in 1.x versions
+- **File Validation**: All uploaded files are validated for type and size
+- **Sandboxed Processing**: File processing happens in isolated containers
+- **Environment Variables**: All sensitive data is stored in environment variables
+
+### Known Dependencies
+
+- **fluent-ffmpeg**: Currently using v2.1.3 which shows a deprecation warning. This is a widely used package with no direct replacement yet. Monitor for updates to newer alternatives like `node-ffmpeg` or `ffmpeg-static`
+
 ## 🤝 Contributing
 
 1. Fork the repository
