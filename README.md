@@ -124,6 +124,7 @@ THUMBNAIL_SIZES=250,500,1000
 ### Bucket Configuration
 
 FileFlow creates three MinIO buckets automatically:
+
 - `fileflow-uploads`: Original uploaded files
 - `fileflow-processed`: Processed/converted files
 - `fileflow-thumbnails`: Generated thumbnails
@@ -131,27 +132,28 @@ FileFlow creates three MinIO buckets automatically:
 ## API Documentation
 
 ### Base URL
+
 ```
 http://localhost:3000
 ```
 
 ### File Operations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/files/upload` | Upload files with multipart/form-data |
-| `GET` | `/api/v1/files/{id}` | Retrieve file information and metadata |
-| `GET` | `/api/v1/files/{id}/download` | Get file download URL |
-| `GET` | `/api/v1/files/{id}/stream` | Stream file content directly |
-| `DELETE` | `/api/v1/files/{id}` | Delete file (soft delete) |
-| `GET` | `/api/v1/files/search` | Search files with query parameters |
+| Method   | Endpoint                      | Description                            |
+| -------- | ----------------------------- | -------------------------------------- |
+| `POST`   | `/api/v1/files/upload`        | Upload files with multipart/form-data  |
+| `GET`    | `/api/v1/files/{id}`          | Retrieve file information and metadata |
+| `GET`    | `/api/v1/files/{id}/download` | Get file download URL                  |
+| `GET`    | `/api/v1/files/{id}/stream`   | Stream file content directly           |
+| `DELETE` | `/api/v1/files/{id}`          | Delete file (soft delete)              |
+| `GET`    | `/api/v1/files/search`        | Search files with query parameters     |
 
 ### System Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/` | API information and version |
-| `GET` | `/health` | System health status |
+| Method | Endpoint  | Description                 |
+| ------ | --------- | --------------------------- |
+| `GET`  | `/`       | API information and version |
+| `GET`  | `/health` | System health status        |
 
 ## 📤 Upload Examples
 
@@ -304,6 +306,7 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ### Service Dependencies
 
 Services start in order:
+
 1. PostgreSQL, Redis, MinIO
 2. MinIO bucket initialization
 3. FileFlow API server
@@ -314,6 +317,7 @@ Services start in order:
 ### Health Checks
 
 All services include health checks:
+
 - API server: HTTP endpoint monitoring
 - Database: Connection testing
 - Redis: Ping/pong verification
@@ -322,6 +326,7 @@ All services include health checks:
 ### Logging
 
 Structured logging with Winston:
+
 - Console output (development)
 - File rotation (production)
 - Error tracking and job monitoring
@@ -329,6 +334,7 @@ Structured logging with Winston:
 ### Metrics
 
 Built-in metrics available:
+
 - File upload rates
 - Processing queue length
 - Job completion times
@@ -408,64 +414,3 @@ docker-compose up
 ### Known Dependencies
 
 - **fluent-ffmpeg**: Currently using v2.1.3 which shows a deprecation warning. This is a widely used package with no direct replacement yet. Monitor for updates to newer alternatives like `node-ffmpeg` or `ffmpeg-static`
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/fileflow-pipeline/issues)
-- **Documentation**: [Wiki](https://github.com/your-username/fileflow-pipeline/wiki)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/fileflow-pipeline/discussions)
-
-## Development Roadmap
-
-### Phase 1: Security & Authentication
-- JWT-based user authentication and authorization
-- Role-based access control (RBAC)
-- API key management for programmatic access
-
-### Phase 2: Enhanced Features  
-- File versioning and revision history
-- Webhook notifications for processing events
-- Batch file operations and bulk processing
-
-### Phase 3: Scalability & Performance
-- Elasticsearch integration for advanced search
-- CDN integration for global file distribution
-- Horizontal scaling with Kubernetes support
-
-### Phase 4: Enterprise Features
-- Audit logging and compliance reporting
-- Advanced analytics and usage metrics
-- Enterprise SSO integration
-
-## Contributing
-
-We welcome contributions from the community. Please read our contributing guidelines and code of conduct before submitting pull requests.
-
-### Development Setup
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Support
-
-For technical support and questions:
-- GitHub Issues for bug reports and feature requests
-- Documentation for comprehensive guides
-- Security issues should be reported privately through GitHub Security advisories

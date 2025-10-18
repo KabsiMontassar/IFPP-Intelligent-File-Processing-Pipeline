@@ -438,20 +438,3 @@ docker compose exec minio mc mirror /data /backup
 # Environment backup
 cp .env .env.backup
 ```
-
-## Support and Troubleshooting
-
-For production deployments and technical support:
-
-1. **Check System Health**: `curl http://localhost:3000/health`
-2. **Review Service Logs**: `docker compose logs -f`
-3. **Verify Configuration**: Ensure all environment variables are properly set
-4. **Database Connectivity**: Test PostgreSQL connection independently
-5. **Network Issues**: Verify Docker network configuration
-6. **Resource Constraints**: Monitor CPU and memory usage
-
-### Community Support
-
-- **GitHub Issues**: Report bugs and request features
-- **Documentation**: Comprehensive API and deployment guides
-- **Security**: Report vulnerabilities privately through GitHub Security tab
