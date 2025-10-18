@@ -81,7 +81,7 @@ services:
       minio:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3000
       DB_HOST: postgres
       DB_PORT: 5432
@@ -99,13 +99,9 @@ services:
       UPLOAD_BUCKET: fileflow-uploads
       PROCESSED_BUCKET: fileflow-processed
       THUMBNAIL_BUCKET: fileflow-thumbnails
-    volumes:
-      - ./src:/app/src
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
     ports:
       - "3000:3000"
-    command: npm run dev
+    command: npm start
 
   # FileFlow Worker Process
   fileflow-worker:
@@ -120,7 +116,7 @@ services:
       minio:
         condition: service_healthy
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: fileflow
@@ -137,11 +133,7 @@ services:
       UPLOAD_BUCKET: fileflow-uploads
       PROCESSED_BUCKET: fileflow-processed
       THUMBNAIL_BUCKET: fileflow-thumbnails
-    volumes:
-      - ./src:/app/src
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-    command: npm run worker
+    command: npm run start:worker
 
 volumes:
   postgres_data:
