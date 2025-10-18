@@ -86,7 +86,7 @@ curl -X POST -F "files=@path/to/your/file.pdf" \
 curl "http://localhost:3000/api/v1/files/search?limit=10"
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -155,7 +155,7 @@ http://localhost:3000
 | `GET`  | `/`       | API information and version |
 | `GET`  | `/health` | System health status        |
 
-## 📤 Upload Examples
+## Upload Examples
 
 ### Single File Upload
 
@@ -191,7 +191,7 @@ const result = await response.json();
 console.log('Upload result:', result);
 ```
 
-## 🔍 Search Examples
+## Search Examples
 
 ### Text Search
 
@@ -206,7 +206,7 @@ curl "http://localhost:3000/api/v1/files/search?mimeType=image"
 curl "http://localhost:3000/api/v1/files/search?q=report&dateFrom=2023-01-01&limit=10"
 ```
 
-## 🏃‍♂️ Development
+## Development
 
 ### Local Development Setup
 
@@ -249,7 +249,7 @@ src/
 └── index.ts          # Application entry point
 ```
 
-## 🔄 Background Processing
+## Background Processing
 
 FileFlow uses Redis Bull Queue for background processing:
 
@@ -270,7 +270,7 @@ curl http://localhost:3000/api/v1/admin/queues/status
 curl http://localhost:3000/api/v1/admin/queues/failed
 ```
 
-## 📊 Database Schema
+## Database Schema
 
 ### Key Tables
 
@@ -291,7 +291,7 @@ files (1) ────── (0..*) processed_files
 files (1) ────── (0..*) processing_jobs
 ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Production Deployment
 
@@ -312,7 +312,7 @@ Services start in order:
 3. FileFlow API server
 4. FileFlow worker processes
 
-## 📈 Monitoring & Logging
+## Monitoring & Logging
 
 ### Health Checks
 
@@ -340,7 +340,7 @@ Built-in metrics available:
 - Job completion times
 - Error rates by service
 
-## 🔒 Security
+## Security
 
 ### Features
 
@@ -350,15 +350,7 @@ Built-in metrics available:
 - **File Validation**: Type and size restrictions
 - **Input Sanitization**: Request validation
 
-### Production Recommendations
-
-1. **Environment Variables**: Use secrets management
-2. **HTTPS**: Enable SSL/TLS termination
-3. **Authentication**: Add JWT or OAuth integration
-4. **Network**: Use private networks for services
-5. **Monitoring**: Enable security event logging
-
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -402,7 +394,7 @@ export LOG_LEVEL=debug
 docker-compose up
 ```
 
-## 🔒 Security & Known Issues
+## Security & Known Issues
 
 ### Security Considerations
 
