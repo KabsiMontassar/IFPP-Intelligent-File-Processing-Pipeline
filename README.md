@@ -1,20 +1,32 @@
 # FileFlow - Intelligent File Processing Pipeline
 
-A scalable, production-ready file processing pipeline built with Node.js, TypeScript, and Docker. FileFlow automatically extracts metadata, generates thumbnails, processes videos, and makes file content searchable.
+A scalable, production-ready file processing pipeline built with Node.js, TypeScript, and Docker. FileFlow automatically extracts metadata, generates thumbnails, processes videos, and makes file content searchable through a comprehensive REST API.
 
-## 🚀 Features
+## Features
 
-- **File Upload API**: RESTful API with multipart/form-data support
-- **Object Storage**: MinIO S3-compatible storage with bucket management
-- **Background Processing**: Redis Bull Queue for async job processing
-- **Metadata Extraction**: Apache Tika integration for 100+ file types
-- **Image Processing**: Automatic thumbnail generation in multiple sizes
-- **Video Processing**: Video thumbnail extraction and metadata parsing
-- **Search Functionality**: Full-text search with PostgreSQL and metadata indexing
-- **Production Ready**: Docker containerization with health checks
-- **Type Safety**: Full TypeScript implementation with strict typing
+### Core Capabilities
 
-## 🏗️ Architecture
+- **RESTful File Upload API** - Multipart/form-data support with validation
+- **S3-Compatible Object Storage** - MinIO integration with automated bucket management
+- **Asynchronous Background Processing** - Redis Bull Queue for scalable job processing
+- **Universal Metadata Extraction** - Apache Tika integration supporting 100+ file formats
+- **Automated Image Processing** - Multi-size thumbnail generation with Sharp
+- **Video Processing Pipeline** - Thumbnail extraction and metadata parsing with FFmpeg
+- **Full-Text Search Engine** - PostgreSQL-based search with GIN indexes
+- **Production-Grade Infrastructure** - Complete Docker containerization with health monitoring
+- **Type-Safe Implementation** - Full TypeScript coverage with strict type checking
+
+### Technical Stack
+
+- **Backend**: Node.js 18+ with Express.js framework
+- **Language**: TypeScript with strict mode enabled
+- **Database**: PostgreSQL 15 with full-text search capabilities
+- **Cache & Queue**: Redis 7 for caching and job queue management
+- **Object Storage**: MinIO for S3-compatible file storage
+- **Processing**: Apache Tika, Sharp, FFmpeg for content processing
+- **Infrastructure**: Docker with multi-service orchestration
+
+## System Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -30,59 +42,48 @@ A scalable, production-ready file processing pipeline built with Node.js, TypeSc
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
-- **Node.js** 18.0+ and npm 8.0+
-- **Docker** and Docker Compose
+- **Docker 20.10+** and Docker Compose V2
 - **Git** for version control
+- **Node.js 18.0+** and npm 8.0+ (for local development only)
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/fileflow-pipeline.git
-cd fileflow-pipeline
-```
-
-### 2. Environment Setup
+### 1. Clone and Setup
 
 ```bash
-# Copy environment template
+git clone https://github.com/KabsiMontassar/IFPP-Intelligent-File-Processing-Pipeline.git
+cd IFPP-Intelligent-File-Processing-Pipeline
 cp .env.example .env
-
-# Edit environment variables (optional - defaults work for development)
-# nano .env
 ```
 
-### 3. Start Services
+### 2. Deploy with Docker
 
 ```bash
-# Start all services with Docker Compose
-docker-compose up -d
+# Start all services
+docker compose up -d
 
-# Check service status
-docker-compose ps
+# Verify deployment
+docker compose ps
 ```
 
-### 4. Install Dependencies (for development)
+### 3. Access Services
+
+- **API Server**: http://localhost:3000
+- **MinIO Console**: http://localhost:9001 (admin: `fileflow_admin` / `fileflow_admin_password`)
+- **Health Check**: http://localhost:3000/health
 
 ```bash
-# Install Node.js dependencies
-npm install
-
-# Build TypeScript
-npm run build
-```
-
-### 5. Verify Installation
-
-```bash
-# Check API health
+# Test API availability
 curl http://localhost:3000/health
 
-# Check services are running
-curl http://localhost:3000/
+# Upload a test file
+curl -X POST -F "files=@path/to/your/file.pdf" \
+  http://localhost:3000/api/v1/files/upload
+
+# Search uploaded files
+curl "http://localhost:3000/api/v1/files/search?limit=10"
 ```
 
 ## 🔧 Configuration
@@ -127,31 +128,30 @@ FileFlow creates three MinIO buckets automatically:
 - `fileflow-processed`: Processed/converted files
 - `fileflow-thumbnails`: Generated thumbnails
 
-## 📡 API Endpoints
+## API Documentation
+
+### Base URL
+```
+http://localhost:3000
+```
 
 ### File Operations
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/files/upload` | Upload files (multipart/form-data) |
-| `GET` | `/api/v1/files/:id` | Get file information and metadata |
-| `GET` | `/api/v1/files/:id/download` | Download file or get presigned URL |
-| `GET` | `/api/v1/files/:id/stream` | Stream file content |
-| `DELETE` | `/api/v1/files/:id` | Delete file (soft delete) |
+| `POST` | `/api/v1/files/upload` | Upload files with multipart/form-data |
+| `GET` | `/api/v1/files/{id}` | Retrieve file information and metadata |
+| `GET` | `/api/v1/files/{id}/download` | Get file download URL |
+| `GET` | `/api/v1/files/{id}/stream` | Stream file content directly |
+| `DELETE` | `/api/v1/files/{id}` | Delete file (soft delete) |
+| `GET` | `/api/v1/files/search` | Search files with query parameters |
 
-### Search
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/files/search` | Search files by content, metadata, or filename |
-
-### Health & Monitoring
+### System Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/health` | Overall system health |
-| `GET` | `/health/ready` | Readiness check (Kubernetes) |
-| `GET` | `/health/live` | Liveness check (Kubernetes) |
+| `GET` | `/` | API information and version |
+| `GET` | `/health` | System health status |
 
 ## 📤 Upload Examples
 
@@ -427,13 +427,45 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [Wiki](https://github.com/your-username/fileflow-pipeline/wiki)
 - **Discussions**: [GitHub Discussions](https://github.com/your-username/fileflow-pipeline/discussions)
 
-## 🗺️ Roadmap
+## Development Roadmap
 
-- [ ] **Authentication & Authorization**: JWT-based user management
-- [ ] **File Versioning**: Track file modifications and history
-- [ ] **Advanced Search**: Elasticsearch integration
-- [ ] **Webhooks**: Event notifications for file processing
-- [ ] **CDN Integration**: CloudFront/CloudFlare support
-- [ ] **Batch Operations**: Bulk file processing
-- [ ] **API Rate Limiting**: Per-user quotas
-- [ ] **Audit Logging**: Comprehensive activity tracking
+### Phase 1: Security & Authentication
+- JWT-based user authentication and authorization
+- Role-based access control (RBAC)
+- API key management for programmatic access
+
+### Phase 2: Enhanced Features  
+- File versioning and revision history
+- Webhook notifications for processing events
+- Batch file operations and bulk processing
+
+### Phase 3: Scalability & Performance
+- Elasticsearch integration for advanced search
+- CDN integration for global file distribution
+- Horizontal scaling with Kubernetes support
+
+### Phase 4: Enterprise Features
+- Audit logging and compliance reporting
+- Advanced analytics and usage metrics
+- Enterprise SSO integration
+
+## Contributing
+
+We welcome contributions from the community. Please read our contributing guidelines and code of conduct before submitting pull requests.
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with tests
+4. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Support
+
+For technical support and questions:
+- GitHub Issues for bug reports and feature requests
+- Documentation for comprehensive guides
+- Security issues should be reported privately through GitHub Security advisories

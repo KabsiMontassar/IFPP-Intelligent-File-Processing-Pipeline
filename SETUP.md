@@ -1,55 +1,103 @@
-# FileFlow Setup Instructions
+# FileFlow Deployment Guide
 
-## Prerequisites
+Complete setup instructions for the FileFlow Intelligent File Processing Pipeline.
 
-Before starting, ensure you have the following installed:
+## System Requirements
 
-- **Node.js 18+** - [Download here](https://nodejs.org/)
-- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop/)
-- **Git** - [Download here](https://git-scm.com/)
+### Production Environment
+- **Docker** 20.10+ with Docker Compose V2
+- **Memory**: 4GB RAM minimum, 8GB recommended
+- **Storage**: 20GB available disk space
+- **Network**: Internet access for Docker image downloads
 
-## Quick Setup Guide
+### Development Environment (Optional)
+- **Node.js** 18.0+ with npm 8.0+
+- **TypeScript** 4.9+ (installed automatically)
+- **Git** 2.30+ for version control
 
-### 1. Clone and Setup
+## Production Deployment
+
+### 1. Environment Preparation
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd fileflow-pipeline
+git clone https://github.com/KabsiMontassar/IFPP-Intelligent-File-Processing-Pipeline.git
+cd IFPP-Intelligent-File-Processing-Pipeline
 
-# Copy environment file
+# Create environment configuration
 cp .env.example .env
-
-# Install dependencies
-npm install
-
-# If you encounter package-lock.json conflicts, regenerate it:
-# rm package-lock.json && npm install
 ```
 
-### 2. Start Services with Docker
+### 2. Configuration Review
+
+Edit `.env` file for production settings:
 
 ```bash
-# Start all services in the background
-docker-compose up -d
+# Production configuration
+NODE_ENV=production
+PORT=3000
 
-# Wait for services to initialize (about 30-60 seconds)
-docker-compose logs -f
+# Security: Change default passwords
+DB_PASSWORD=your-secure-database-password
+REDIS_PASSWORD=your-secure-redis-password
+MINIO_ACCESS_KEY=your-minio-access-key
+MINIO_SECRET_KEY=your-minio-secret-key
 
-# Check all services are healthy
-docker-compose ps
+# JWT Security
+JWT_SECRET=your-super-secure-jwt-secret-key
+
+# File Processing Limits
+MAX_FILE_SIZE=104857600  # 100MB
+ALLOWED_FILE_TYPES=pdf,doc,docx,xls,xlsx,ppt,pptx,txt,csv,json,xml,jpg,jpeg,png,gif,bmp,tiff,mp4,avi,mov,wmv,flv,webm,mp3,wav,flac
 ```
 
-### 3. Verify Installation
+### 3. Service Deployment
 
 ```bash
-# Test API health
+# Deploy all services
+docker compose up -d
+
+# Monitor deployment progress
+docker compose logs -f
+
+# Verify all services are healthy
+docker compose ps
+```
+
+```bash
+# Check system health
 curl http://localhost:3000/health
 
-# Test file upload
-curl -X POST \
-  http://localhost:3000/api/v1/files/upload \
-  -F 'files=@/path/to/test/file.pdf'
+# Test file upload capability
+curl -X POST -F "files=@/path/to/test/file.pdf" \
+  http://localhost:3000/api/v1/files/upload
+
+# Verify file search functionality
+curl "http://localhost:3000/api/v1/files/search?limit=10"
+```
+
+## Service Architecture
+
+The system consists of the following components:
+
+### Core Services
+
+1. **FileFlow API** - Express.js REST API server
+2. **FileFlow Worker** - Background job processor
+3. **PostgreSQL** - Primary database for metadata and file records
+4. **Redis** - Cache and job queue management
+5. **MinIO** - S3-compatible object storage
+
+### Service Dependencies
+
+```mermaid
+graph TD
+    A[FileFlow API] --> B[PostgreSQL]
+    A --> C[Redis]
+    A --> D[MinIO]
+    E[FileFlow Worker] --> B
+    E --> C
+    E --> D
 ```
 
 ## Manual Service Setup (Development)
@@ -349,11 +397,61 @@ docker system prune -a
 npm run migrate
 ```
 
-## Support
+## Maintenance
 
-If you encounter issues:
+### Log Management
 
-1. Check the logs: `docker-compose logs`
-2. Verify service health: `curl http://localhost:3000/health`
-3. Review the troubleshooting section
-4. Create an issue on GitHub with logs and error details
+```bash
+# View application logs
+docker compose logs fileflow-api
+docker compose logs fileflow-worker
+
+# Monitor all services
+docker compose logs -f
+
+# Log rotation (production)
+docker compose logs --tail=1000 > fileflow.log
+```
+
+### Performance Monitoring
+
+```bash
+# Check resource usage
+docker stats
+
+# Monitor disk usage
+df -h
+
+# Check database connections
+docker compose exec postgres psql -U fileflow -d fileflow_db -c "SELECT COUNT(*) FROM pg_stat_activity;"
+```
+
+### Backup and Recovery
+
+```bash
+# Database backup
+docker compose exec postgres pg_dump -U fileflow fileflow_db > backup.sql
+
+# MinIO data backup
+docker compose exec minio mc mirror /data /backup
+
+# Environment backup
+cp .env .env.backup
+```
+
+## Support and Troubleshooting
+
+For production deployments and technical support:
+
+1. **Check System Health**: `curl http://localhost:3000/health`
+2. **Review Service Logs**: `docker compose logs -f`
+3. **Verify Configuration**: Ensure all environment variables are properly set
+4. **Database Connectivity**: Test PostgreSQL connection independently
+5. **Network Issues**: Verify Docker network configuration
+6. **Resource Constraints**: Monitor CPU and memory usage
+
+### Community Support
+
+- **GitHub Issues**: Report bugs and request features
+- **Documentation**: Comprehensive API and deployment guides
+- **Security**: Report vulnerabilities privately through GitHub Security tab
