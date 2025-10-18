@@ -259,6 +259,9 @@ WHERE f.deleted_at IS NULL
 GROUP BY f.id, f.original_name, f.filename, f.mime_type, f.size_bytes, f.status, f.created_at,
          fm.title, fm.author, fm.subject, fm.description, fm.keywords, fm.extracted_text;
 
--- Create search index on the view
-CREATE INDEX idx_file_search_title ON file_search_view USING gin(search_title gin_trgm_ops);
-CREATE INDEX idx_file_search_text ON file_search_view USING gin(extracted_text gin_trgm_ops);
+-- Create search indexes on the underlying tables instead of the view
+CREATE INDEX idx_file_metadata_title ON file_metadata USING gin(title gin_trgm_ops);
+CREATE INDEX idx_file_metadata_extracted_text ON file_metadata USING gin(extracted_text gin_trgm_ops);
+CREATE INDEX idx_files_original_name ON files USING gin(original_name gin_trgm_ops);
+CREATE INDEX idx_file_metadata_description ON file_metadata USING gin(description gin_trgm_ops);
+CREATE INDEX idx_file_metadata_keywords ON file_metadata USING gin(keywords gin_trgm_ops);
